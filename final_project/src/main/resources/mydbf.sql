@@ -1,0 +1,5 @@
+DROP DATABASE IF EXISTS mydbp1;
+CREATE DATABASE mydbp1;
+USE mydbp1;
+
+GRANT SELECT, INSERT, DELETE, UPDATE ON mydbp1.* TO admin@localhost IDENTIFIED BY 'pass@word';

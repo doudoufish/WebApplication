@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>World Best Gamming club</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+    
+
+    <script>
+        var members = [];
+        var equips = [];
+
+        $().ready(function () {
+            $.ajax({
+                url: "equips", success: function (result) {
+                    equips = result;
+                    $equips = $('#equips');
+                    option = '<option disabled selected value> -- select an option -- </option>';
+                    $equips.append(option);
+                    equips.forEach((e) => {
+                        console.log(e);
+                        
+                        let option = '<option value="' + e.equipId + '">' + e.name + '</option?';
+                        $equips.append(option);
+                    });
+                }
+            });
+        
+
+            $.ajax({
+                url: "members", success: function (result) {
+                    members = result;
+                    $member = $('#member');
+                    option = '<option disabled selected value> -- select an option -- </option>';
+                    $member.append(option);
+                    members.forEach((m) => {
+                        let option = '<option value="' + m.personId + '">' + m.personName + '</option?';
+                        $member.append(option);
+                    });
+                }
+            });
+
+           
+            $('#equips').on('change', function() {
+            //$('#equips').click((e) => {
+                let equip = equips.find((e) => {
+                    return e.equipId == $('#equips').val();
+                })
+                console.log(equip);
+
+                $('#equipId').val(equip.equipId);
+                $('#name').val(equip.name);
+                $('#price').val(equip.price);
+                $('#date').val(equip.date);
+                $('#broken').attr("checked", equip.broken);
+                $('#member').val(equip.memberId);
+                
+
+                
+            });
+
+            $('#new').click((e) => {
+                $('#name').val('');
+                $('#price').val('');
+                $('#date').val('');
+                $('#broken').attr("checked");
+                $('#member').val('');
+                
+            });
+
+            $('#add').click((e) => {
+                let equip = {};
+
+                
+                equip.name = $('#name').val();
+                equip.date = $('#date').val();
+                equip.price = $('#price').val();
+                equip.broken = $('#broken').is(':checked');
+                equip.memberId = $('#member').val();
+                console.log(equip);
+                
+                $.ajax({
+                    url: "/equips",
+                    type: 'POST',
+                    data: JSON.stringify(equip),
+                    contentType: 'application/json',
+                    success: function (data, status) {
+                        alert('message:' + data.message + ', status = ' + status);
+                        location.reload();
+                    }
+                });
+            });
+
+            $('#update').click((e) => {
+                let equip = {};
+
+                equip.equipId = $('#equipId').val();
+                equip.name = $('#name').val();
+                equip.date = $('#date').val();
+                equip.price = $('#price').val();
+                equip.broken = $('#broken').is(':checked');
+                equip.memberId = $('#member').val();
+
+                $.ajax({
+                    url: "/equips",
+                    type: 'PUT',
+                    data: JSON.stringify(equip),
+                    contentType: 'application/json',
+                    success: function (data, status) {
+                        alert('message:' + data.message + ', status = ' + status);
+                        location.reload();
+                    }
+                });
+            });
+
+            $('#delete').click((e) => {
+                let equip = {};
+                equip.equipId = $('#equipId').val();
+
+                $.ajax({
+                    url: "/equips/" + equip.equipId,
+                    type: 'DELETE',
+                    data: "{}",
+                    contentType: 'application/json',
+                    success: function (data, status) {
+                        alert('message:' + data.message + ', status = ' + status);
+                        location.reload();
+                    }
+                });
+            });
+
+        });
+
+    </script>
+</head>
+
+<body>
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <a class="navbar-brand" style="text-decoration:none; " href="#">WSGC</a>
+          </div>
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="home.html">Home</a></li>
+            <li><a href="teams.html">Team Page</a></li>
+            <li><a href="person.html">Personal Page</a></li>
+            <li><a href="equip.html">Equipment Page</a></li>
+          </ul>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-1" >
+                <label for="equips">Equip List</label><br>
+              </div>
+          <div class="col-sm-3" >
+            <select class ="form-control" name="equips" id="equips"></select>
+          </div>
+        </div>
+        <br>
+
+        <div class="row">
+            <div class="col-sm-1" >
+                <input type="text" hidden id="equipId" />
+                <label for="name">Name: </label>
+              </div>
+          <div class="col-sm-3" >
+                <input class="form-control" type="text" id="name" />
+          </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-sm-1" >
+                <label  for="date">Date: </label>
+              </div>
+            <div class="col-sm-3">
+                <input class="form-control" type="text" id="date" />
+            </div>
+          </div>
+        <br>
+        <div class="row">
+            <div class="col-sm-1" >
+                <label for="price">Price: </label>
+              </div>
+            <div class="col-sm-3">
+                <input class="form-control" type="text" id="price" />
+            </div>
+          </div>
+          <br>
+          <div class="row">
+            <div class="col-sm-1" >
+                <label for="member">Member</label>
+              </div>
+            <div class="col-sm-3">
+              
+              <select class="form-control" id="member"></select>
+            </div>
+          </div>
+          <br>
+          <div class="row">
+            <div class="col-sm-1" >
+                <label for="broken">Broken: </label>
+              </div>
+            <div class="col-sm-3">
+              
+                <input id="broken" type="checkbox" />
+            </div>
+          </div>
+          <br>
+          <br>
+          <div class="row">
+            <div class="col-sm-1" >
+                <button type="button" class="btn btn-primary form-control" id="new">New</button>
+              </div>
+            <div class="col-sm-1">
+                <button type="button" class="btn btn-primary form-control" id="add">Add</button> 
+            </div>
+            <div class="col-sm-1">
+                <button type="button" class="btn btn-info form-control" id="update">Update</button> 
+            </div>
+            <div class="col-sm-1">
+                <button type="button" class="btn btn-danger form-control" id="delete">Delete</button> 
+            </div>
+          </div>
+          <hr>
+
+          <br>
+          
+      </div>
+     
+    
+  
+    <div >
+
+   
+    
+    
+    <h6 id="result"></h6>
+</body>
+
+</html>

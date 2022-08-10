@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>World Best Gamming club</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+    <style>
+        table,
+        th,
+        td {
+            border: 1px solid;
+        }
+    </style>
+
+    <script>
+        var teams = [];
+
+        $().ready(function () {
+            $.ajax({
+                url: "teams", success: function (result) {
+                    teams = result;
+                    $teams = $('#teams');
+                    option = '<option disabled selected value> -- select an option -- </option>';
+                    $teams.append(option);
+                    teams.forEach((p) => {
+                        let option = '<option value="' + p.teamId + '">' + p.teamName + '</option>';
+                        $teams.append(option);
+                    });
+                }
+            });
+            $('#teams').on('change', function() {
+            //$('#teams').click((e) => {
+                let team = teams.find((p) => {
+                    return p.teamId == $('#teams').val();
+                })
+
+                $('#teamId').val(team.teamId);
+                $('#teamName').val(team.teamName);
+                $('#teamSize').val(team.teamSize);
+                $('#teamRate').val(team.teamRate);
+
+
+                $body = $('#members > tbody');
+                $body.html('');
+                team.members.forEach((m) => {
+                    let row = '<tr>' +
+                        '<td>' + m.personId + '</td>' +
+                        '<td>' + m.personName + '</td>' +
+                        '<td>' + m.emailAddress + '</td>' +
+                        '</tr>';
+                    $body.append(row);
+                });
+
+            });
+
+            $('#add').click((e) => {
+                let team = {};
+                team.teamName = $('#teamName').val();
+                team.teamRate = $('#teamRate').val();
+
+                $.ajax({
+                    url: "/teams",
+                    type: 'POST',
+                    data: JSON.stringify(team),
+                    contentType: 'application/json',
+                    success: function (data, status) {
+                        alert('message:' + data.message + ', status = ' + status);
+                        location.reload();
+                    }
+                });
+            });
+
+            $('#update').click((e) => {
+                team = {};
+                team.teamId = $('#teamId').val();
+                team.teamName = $('#teamName').val();
+                team.teamSzie = $('#teamSize').val();
+                team.teamRate = $('#teamRate').val();
+
+                $.ajax({
+                    url: "/teams",
+                    type: 'PUT',
+                    data: JSON.stringify(team),
+                    contentType: 'application/json',
+                    success: function (data, status) {
+                        alert('message:' + data.message + ', status = ' + status);
+                        location.reload();
+                    }
+                });
+            });
+
+            
+            $('#new').click((e) => {
+                $('#teamName').val('');
+                $('#teamSize').val(0);
+                $('#teamRate').val('');
+                $body = $('#members > tbody');
+                $body.html('');
+            });
+
+            $('#delete').click((e) => {
+                let team = {};
+                team.teamId = $('#teamId').val();
+
+                $.ajax({
+                    url: "/teams/" + team.teamId,
+                    type: 'DELETE',
+                    data: "{}",
+                    contentType: 'application/json',
+                    success: function (data, status) {
+                        alert('message:' + data.message + ', status = ' + status);
+                        location.reload();
+                    }
+                });
+            });
+        });
+
+    </script>
+</head>
+    <body>
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+              <div class="navbar-header">
+                <a class="navbar-brand" style="text-decoration:none; " href="#">WSGC</a>
+              </div>
+              <ul class="nav navbar-nav">
+                <li class="active"><a href="home.html">Home</a></li>
+                <li><a href="teams.html">Team Page</a></li>
+                <li><a href="person.html">Personal Page</a></li>
+                <li><a href="equip.html">Equipment Page</a></li>
+
+              </ul>
+            </div>
+          </nav>
+    
+          <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-1" >
+                    <label for="teams">Team List</label><br>
+                  </div>
+              <div class="col-sm-3" >
+                
+                <select class ="form-control" name="teams" id="teams"></select>
+                
+              </div>
+            </div>
+            <br>
+
+
+          
+
+            <div class="row">
+                <div class="col-sm-1" >
+                    <input type="text" hidden id="teamId" />
+                    <label for="teamName">Team Name: </label>
+                  </div>
+              <div class="col-sm-3" >
+                    <input class="form-control" type="text" id="teamName" />
+              </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-sm-1" >
+                    <label for="teamRate">Team Rate: </label>
+                  </div>
+                <div class="col-sm-3">
+                  <input class="form-control" type="text" id="teamRate" />
+                </div>
+              </div>
+            <br>
+              <div class="row">
+                <div class="col-sm-1" >
+                    <label for="teamSize">Team Size: </label>
+                  </div>
+                <div class="col-sm-3">
+                  
+                    <input class="form-control" type="number" id="teamSize" /><br>
+                </div>
+              </div>
+              <br>
+              <br>
+              <div class="row">
+                <div class="col-sm-1" >
+                    <button type="button" class="btn btn-primary form-control" id="new">New</button>
+                  </div>
+                <div class="col-sm-1">
+                    <button type="button" class="btn btn-primary form-control" id="add">Add</button> 
+                </div>
+                <div class="col-sm-1">
+                    <button type="button" class="btn btn-info form-control" id="update">Update</button> 
+                </div>
+                <div class="col-sm-1">
+                    <button type="button" class="btn btn-danger form-control" id="delete">Delete</button> 
+                </div>
+              </div>
+              <hr>
+    
+              <br>
+              <div class="row">
+                <div class="col-sm-6" >
+                    <table id="members" class ="table table-bordered table-striped">
+                        <thead>
+                            <th>personId</th>
+                            <th>personName</th>
+                            <th>emailAddress</th>
+                        </thead>
+                        <tbody>
+            
+                        </tbody>
+                    </table>
+                  </div>
+              </div>
+          </div>
+         
+        
+      
+        <div >
+
+
+    <h6 id="result"></h6>
+</body>
+
+</html>
